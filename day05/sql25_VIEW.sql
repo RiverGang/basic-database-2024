@@ -49,3 +49,16 @@ SELECT * FROM sys.databases;
 -- 테이블 내에 존재하는 컬럼명 조회하는 시스템뷰 중 하나
 SELECT * FROM INFORMATION_SCHEMA.COLUMNS
  WHERE TABLE_NAME = 'Book';
+
+-- 인덱스 재구성
+-- PK인 기본키는 값이 추가되면 자동으로 인덱스 제공
+-- 넌클러스터드 인덱스는 재구성이 필요할 수 있음(DBA 정기적으로 작업)
+-- IX_Book_pubprice를 재구성하라
+ALTER INDEX IX_Book_pubprice ON Book REBUILD;
+ALTER INDEX IX_Book_pubprice ON Book REORGANIZE; -- 인덱스 재정리
+
+
+-- 인덱스 삭제
+-- DROP INDEX [인덱스명] ON [인덱스위치]
+DROP INDEX IX_BOOK ON Book;
+DROP INDEX CIX_Customer_name ON Book;

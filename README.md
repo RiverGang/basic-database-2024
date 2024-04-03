@@ -264,11 +264,29 @@ IoT 개발자과정 SQLServer 학습 리포지토리
 
         - 기본키 인덱스 -> 클러스터형
         - 기본키가 없는 인덱스 -> 비클러스터형
+        - SSMS에서 실행계획을 가지고 쿼리 실행 성능을 체크할 수 있음
 
 
 
 - 파이썬 SQL Server 연동 프로그래밍
-    - PyQT GUI 생성
-    - SQL Server 데이터 핸들링
+    - Mdang DB 관리 프로그램
+        - PyQT GUI 생성
+        - SQL Server 데이터 핸들링
+            - pymysql 라이브러리 설치
+
+            ```shell
+            > pip install pymssql
+            ```
+        
+        - DB연결 설정: Oracle, MySQL 등은 설정 없음. 구성관리자에서 TCP/IP로 접근을 허용하지 않으면 접속 안됨
+            1. 시작메뉴 > 모든 앱 > Microsoft SQL Server 20xx > **SQL Server 20xx 구성관리자** 실행
+            2. SQL Server 네트워크 구성 > **MSSQL SERVER에 대한 프로토콜** 클릭
+            3. TCP/IP 프로토콜 상태가 사용안함(최초) > **TCP/IP** 더블클릭
+            4. **프로토콜 사용 > '예'**로 변경
+            5. IP주소 탭 > IP주소가 본인 아이피인 것 > **사용 > '예'**로 변경
+            6. 127.0.0.1로 된 주소 > **사용 > '예'**로 변경
+            7. 적용 후 > SQL Server 서비스 > SQL Server(MSSQLSERVER) 더블클릭 후 > **다시 시작** 버튼 클릭 > **재시작** 필수
+
+            ![구성관리자](https://raw.githubusercontent.com/RiverGang/basic-database-2024/main/images/db005.png)
 
 - 데이터베이스 모델링
