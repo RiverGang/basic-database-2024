@@ -72,4 +72,8 @@ UPDATE Customer
       , phone = '+01 010-9999-0000'
  WHERE custid = 5;
 
- 
+-- 삭제
+DELETE FROM CustomerNew
+ WHERE custid = 5;
+
+
