@@ -294,4 +294,10 @@ IoT 개발자과정 SQLServer 학습 리포지토리
     - Mdang DB 관리 프로그램
         - PyQt5 + pymssql
 
+        - 문제점: 한글 깨짐문제
+            1. DB 테이블의 varchar(ASCII) -> nvarchar(UTF-8) 변경
+            2. Python에서 pymssql로 접속할 때, Charset을 'UTF8'로 설정
+            3. INSERT 쿼리에 한글 입력되는 컬럼은 홑따옴표 앞 N을 붙여준다 ==> N'' (유니코드로 입력하라는 뜻)
+        
+
 - 데이터베이스 모델링

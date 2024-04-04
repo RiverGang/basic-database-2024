@@ -16,7 +16,7 @@ serverName = '127.0.0.1'
 userId = 'sa'
 userPass = 'mssql_p@ss'
 dbName = 'Madang'
-dbCharset = 'EUC-KR'
+dbCharset = 'UTF8'
 # 저장버튼 클릭 시, 삽입/수정을 구분짓기 위한 구분자
 mode = 'I'
 
@@ -28,6 +28,10 @@ class qtAPP(QMainWindow):
         self.initUI()
 
     def initUI(self) -> None:
+        # 입력제한
+        self.txtBookid.setValidator(QIntValidator(self)) # 숫자만 입력되도록 제한
+        self.txtPrice.setValidator(QIntValidator(self))
+        
         # Button 4개에 대해서 사용등록
         self.btnNew.clicked.connect(self.btnNewClicked) ## 신규버튼 시그널(이벤트)에 대한 슬롯함수(26행) 생성
         self.btnSave.clicked.connect(self.btnSaveClicked) ## 저장버튼
@@ -35,8 +39,10 @@ class qtAPP(QMainWindow):
         self.btnReload.clicked.connect(self.btnReloadClicked) ## 조회버튼
         self.tblBooks.itemSelectionChanged.connect(self.tblBooksSelected) ## 테이블위젯 결과를 클릭 시 발생
         self.show()
+        self.btnReloadClicked() # 프로그램 시작시 목록이 바로 뜨도록
 
     def btnNewClicked(self): # 신규버튼 클릭
+        global mode # 전역변수 사용
         mode = 'I'
         
         ## 입력 창(QLineEdit) 초기화
@@ -44,7 +50,8 @@ class qtAPP(QMainWindow):
         self.txtBookname.setText('')
         self.txtPublisher.setText('')
         self.txtPrice.setText('')
-        # TODO : 선택한 데이터에서 신규를 누르면 self.txtBookid 사용여부는 변경해줘야함
+        ### 선택한 데이터에서 신규를 누르면 self.txtBookid 사용여부는 변경해줘야함
+        self.txtBookid.setEnabled(True) # 신규버튼 클릭 시, 비활성화 되어있던 책번호 텍스트박스 다시 사용 가능
     
     def btnSaveClicked(self): # 저장버튼 클릭
         # 입력검증(Validation Check) 필수
@@ -53,6 +60,7 @@ class qtAPP(QMainWindow):
         bookName = self.txtBookname.text()
         publisher = self.txtPublisher.text()
         price = self.txtPrice.text()
+        print(bookid, bookName, publisher, price)
         
         warningMsg = '' # 경고메세지
         isValid = True # 빈 값이 있으면 False로 변경
@@ -72,33 +80,98 @@ class qtAPP(QMainWindow):
         
         if isValid == False: # 위 입력값 중에 하나라도 빈값이 존재
             QMessageBox.warning(self, '저장경고', warningMsg)
-            return
-        
+            return # 함수 탈출 
 
         ## QlingEdig(=txtbox)는 NONE이 아닌 Empty('')상태!
-
-        ## 2. 현재 존재하는 번호와 같은 번호를 사용했는지 체크, 이미 있는 번호면 DB입력 쿼리 실행이 안되도록 막아야 함
-        ## txtBookid의 QLineEdit에 입력된 data가 Book 테이블에 이미 있는 번호면 COINT => 1, 없으면 카운트 안되니까 0
-        conn = pymssql.connect(server=serverName, user=userId, password=userPass, database=dbName, charset=dbCharset)
-        cursor = conn.cursor(as_dict=False)# COUNT(*)은 데이터가 딱 1개이기때문에 as_dict=False 
-
-        query = f'''SELECT COUNT(*)
-                     FROM Book
-                    WHERE bookid = {self.txtBookid.text()}'''
-        cursor.execute(query)
         
-        # 데이터 하나 => cursor.fetchone()함수로 튜플(1, )을 가져옴
-        valid = cursor.fetchone()[0] ## 튜플의 첫번째 값만
-        conn.close()
+        ## mode='I'일 때는 중복번호를 체크해야 하지만, mode='U'일 때는 체크해서 막으면 수정자체가 안됨
+        print(mode)
+        if mode == 'I':
+            ## 2. 현재 존재하는 번호와 같은 번호를 사용했는지 체크, 이미 있는 번호면 DB입력 쿼리 실행이 안되도록 막아야 함
+            ## txtBookid의 QLineEdit에 입력된 data가 Book 테이블에 이미 있는 번호면 COINT => 1, 없으면 카운트 안되니까 0
+            conn = pymssql.connect(server=serverName, user=userId, password=userPass, database=dbName, charset=dbCharset)
+            cursor = conn.cursor(as_dict=False)# COUNT(*)은 데이터가 딱 1개이기때문에 as_dict=False 
 
-        if valid == 1: # DB Book테이블에 같은 번호 이미 존재
-            QMessageBox.warning(self, '저장경고', '이미 같은 번호의 데이터가 존재합니다.\n번호를 변경하세요.')
-            return
-        else:
-            pass
+            query = f'''SELECT COUNT(*)
+                        FROM Book
+                        WHERE bookid = {bookid}'''
+            cursor.execute(query)
+            
+            # 데이터 하나 => cursor.fetchone()함수로 튜플(1, )을 가져옴
+            valid = cursor.fetchone()[0] ## 튜플의 첫번째 값만
+            conn.close()
 
+            if valid == 1: # DB Book테이블에 같은 번호 이미 존재
+                QMessageBox.warning(self, '저장경고', '이미 같은 번호의 데이터가 존재합니다.\n번호를 변경하세요.')
+                return # 함수 탈출!!
+        
+        ## 3. 입력검증 후 DB Book 테이블에 삽입 or 수정 : [저장]버튼 하나에 두가지(Insert/Updata) 기능
+        ## bookid, bookName, publisher, price
+
+        if mode == 'I': ##INSERT 모드
+            query = f'''INSERT INTO Book
+                        VALUES ({bookid}, N'{bookName}', N'{publisher}', {price})'''
+        elif mode == 'U': ##UPDATA 모드
+            query = f'''UPDATE book
+                           SET bookname = N'{bookName}'
+                             , publisher = N'{publisher}'
+                             , price = {price}
+                         WHERE bookid = {bookid}'''
+            
+        conn = pymssql.connect(server=serverName, user=userId, password=userPass, database=dbName, charset=dbCharset)
+        cursor = conn.cursor(as_dict=False) # INSERT는 데이터를 가져오는게 아님 => False
+        
+        try:
+            cursor.execute(query)
+            conn.commit() # 저장 확립 = commit
+
+            if mode == 'I':
+                QMessageBox.about(self, '저장성공', '데이터를 저장했습니다.')
+            else:
+                QMessageBox.about(self, '수정성공', '데이터를 수정했습니다.')
+
+        except Exception as e:
+            QMessageBox.warning(self, '저장실패', f'{e}')
+            conn.rollback() # 원상복귀
+
+        finally:
+            conn.close() # 오류 여부 상관없이 DB 닫기
+        
+        self.btnReloadClicked() #저장 시, 바로 목록이 조회되도록 설정
+        
     def btnDelClicked(self): # 삭제버튼 클릭
-        QMessageBox.about(self, '버튼', '삭제버튼이 클릭됨')
+        # 삭제기능
+        bookid = self.txtBookid.text()
+        
+        # Validation Check
+        if bookid == None or bookid == '':
+            QMessageBox.warning(self, '삭제경고', '책 번호 없이 삭제할 수 없습니다')
+            return
+        
+        # 삭제여부 한번 더 물어보는 메세지창
+        re = QMessageBox.question(self, '삭제여부', '정말로 삭제하시겠습니까?', QMessageBox.Yes | QMessageBox.No)
+        if re == QMessageBox.No:
+            return # 함수 빠져나가기
+        
+        conn = pymssql.connect(server=serverName, user=userId, password=userPass, database=dbName, charset=dbCharset)
+        cursor = conn.cursor(as_dict=False)
+        query = f'''DELETE FROM Book
+                    WHERE bookid = {bookid}'''
+        
+        try:
+            cursor.execute(query)
+            conn.commit()
+            QMessageBox.about(self, '삭제성공', '데이터를 삭제했습니다')
+        
+        except Exception as e:
+            QMessageBox.warning(self, '삭제실패', f'{e}')
+            conn.rollback()
+        
+        finally:
+            conn.close()
+        
+        self.btnReloadClicked()
+
 
     def btnReloadClicked(self): # 조회버튼 클릭
         lstResult = []
@@ -168,7 +241,6 @@ class qtAPP(QMainWindow):
         bookName = self.tblBooks.item(rowIndex, 1).text()
         publisher = self.tblBooks.item(rowIndex, 2).text()
         price = self.tblBooks.item(rowIndex, 3).text().replace(',','') # 앞서 쿼리에서 FORMAT한 형태를 다시 재설정 숫자만 나오도록
-        print(bookId, bookName, publisher, price)
 
         # 지정된 QlineEdit(TextBox)에 각각 할당
         ## Qt Designer에서 설정한 각각의 QLineEdit(txtBookid, txtBookname ...)에 마우스로 클릭한 행의 값이 출력되도록 각각 대입시키기
@@ -176,6 +248,12 @@ class qtAPP(QMainWindow):
         self.txtBookname.setText(bookName)
         self.txtPublisher.setText(publisher)
         self.txtPrice.setText(price)
+
+        # 모드를 Updata로 변경
+        global mode # 전역변수 mode를 사용 
+        mode = 'U'
+        # txtBookid를 사용하지 못하게 설정
+        self.txtBookid.setEnabled(False)
 
 
 
