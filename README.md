@@ -300,7 +300,10 @@ IoT 개발자과정 SQLServer 학습 리포지토리
             3. INSERT 쿼리에 한글 입력되는 컬럼은 홑따옴표 앞 N을 붙여준다 ==> N'' (유니코드로 입력하라는 뜻)
         
         - 실행화면
-          https://github.com/RiverGang/basic-database-2024/assets/122778656/d4b49971-8115-4ab4-8295-ba6038ef7c2f
+          
+
+https://github.com/RiverGang/basic-database-2024/assets/122778656/ae4c96db-aa08-4939-9c4b-102c403dff19
+
 
 
         
