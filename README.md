@@ -304,13 +304,40 @@ IoT 개발자과정 SQLServer 학습 리포지토리
 
 https://github.com/RiverGang/basic-database-2024/assets/122778656/ae4c96db-aa08-4939-9c4b-102c403dff19
 
-
-
-        
-
 ## 7일차
 - SQL 고급
-    - 트랜잭션
+    - 트랜잭션: All or Nothing
+    - 트랜잭션 속성A(tomicity),C(onsistency),I(solation),D(urability)
+    - TCL(Transaction Control Lag)
+        - BEGIN
+        - TRAN[SACTION]
+        - COMMIT
+        - ROLLBACK
+        - SAVE
+        
+    - SQL Server는 기본적으로 Auto Commit(시스템이 자동으로 트랜잭션을 건다)
+    - SSMS > 도구 > 옵션 > 쿼리실행 > SQL Server > ANSI 
+        -> SET IMPLICIT_TRANSACTIONS 체크 후, 프로그램 재시작
+    
+    - 트랜잭션 로직 처리시, 다른 트랜잭션의 간섭을 받지 않기 위한 것(Lock)
+    - 중요한 데이터 수정/삭제시 잘못된 변경을 방지하기 위한 것
+
 - 데이터베이스 모델링
+    - 설계 순서: 개념 설계 -> 논리 설계 -> 물리 설계
+        - 개념 모델링: 요구사항을 받으면서 정해지지 않은 여러 개체들을 정립화 하는 단계
+        - 논리 모델링: 기본키 지정, 외래키 지정, 관계 정립 속성들 이름(한글) 개체를 픽스
+        - 물리 모델링: DB에 맞춰서 컬럼 이름, 컬럼데이터타입 및 크기 지정, DB에 대한 검토로 테이블을 만들기 직전의 설계 완성
 
+    
+    - ER 모델링 - ERD를 그리기위한 기본 이론
+        - IE(Infomation Engineering) 표기법
+    
+- 인덱스 예제
+    - PK나 인덱스가 없는 상태에서 성능문제 체크
+    - 인덱스가 설정되면 성능이 어떤지 비교
+    - 더미 생성시 100만건으로 제약을 두고 시작
 
+## 8일차
+- 인덱스 예제
+- 정규화
+- 실무실습(사용자, 권한...)
