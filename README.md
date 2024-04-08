@@ -337,6 +337,7 @@ https://github.com/RiverGang/basic-database-2024/assets/122778656/ae4c96db-aa08-
     - 인덱스가 설정되면 성능이 어떤지 비교
     - 더미 생성시 100만건으로 제약을 두고 시작
 
+
     <!-- md 주석(Ctrl+/)![인덱스](https://raw.githubusercontent.com/RiverGang/basic-database-2024/main/images/db005.png) -->   
     <!-- html 이미지 태그가 이미지 사이즈 조정 가능-->
     <img src="https://raw.githubusercontent.com/RiverGang/basic-database-2024/main/images/db006.png" width="800">
