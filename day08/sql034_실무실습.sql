@@ -44,7 +44,3 @@ SELECT FIRST_NAME + ' ' + LAST_NAME AS [NAME]
  SELECT LAST_NAME AS 'e and o Name'
    FROM employees
   WHERE LAST_NAME LIKE '%o%' AND LAST_NAME LIKE '%e%';
-
--- 5. 현재 날짜 타입을 날짜를 함수를 통해 확인, 2006년 5월 20일 부터 2007년 5월 20일 사이에 고용된 사원의 이름(First+Last), 사원번호, 고용일자 출력
--- 단, 입사일 빠른 순으로 정렬하시오(18개행)
-SELECT GETDATE();
